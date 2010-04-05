@@ -1,0 +1,53 @@
+This module is designed to make it easier to write queries for MongoDB in python
+
+Caveats:
+    1) This is an ugly hack that seems to work.
+    2) Field names must have at least one lower-case letter or no capitals
+
+This will import 'M' (for MongoDB or Magic) and 'AND'
+>>> from mongo_magic import *
+
+Simple equality and inequality:
+>>> M.foo == 'bar'
+{'foo': 'bar'}
+>>> M.foo.bar == 'baz'
+{'foo.bar': 'baz'}
+>>> M.foo.bar != 'qux'
+{'foo.bar': {'$ne': 'qux'}}
+
+Ranges:
+>>> 0 < M.foo.bar < 100
+{'foo.bar': {'$gt': 0, '$lt': 100}}
+>>> 0 <= M.foo.bar <= 100
+{'foo.bar': {'$lte': 100, '$gte': 0}}
+
+Helpers that take varargs or iterables:
+>>> M.foo.IN(1,2,3)
+{'foo': {'$in': (1, 2, 3)}}
+>>> M.foo.IN([1,2,3])
+{'foo': {'$in': [1, 2, 3]}}
+>>> M.foo.IN(set([1,2,3]))
+{'foo': {'$in': [1, 2, 3]}}
+>>> M.foo.NIN(1,2,3)
+{'foo': {'$nin': (1, 2, 3)}}
+>>> M.foo.ALL(1,2,3)
+{'foo': {'$all': (1, 2, 3)}}
+
+$exists queries:
+>>> M.foo.EXISTS()
+{'foo': {'$exists': True}}
+>>> M.foo.EXISTS(False)
+{'foo': {'$exists': False}}
+
+Regexes and startswith helper
+>>> M.foo.RE("hello")
+{'foo': {'$regex': 'hello'}}
+>>> M.foo.RE("hello", 'i')
+{'foo': {'$options': 'i', '$regex': 'hello'}}
+>>> M.foo.STARTSWITH('world')
+{'foo': {'$regex': '^world'}}
+
+Combining requirements (must be for different fields):
+>>> AND(M.a == 1, M.b > 10,  M.c.IN('one', 'two'))
+{'a': 1, 'c': {'$in': ('one', 'two')}, 'b': {'$gt': 10}}
+
