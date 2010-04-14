@@ -33,6 +33,14 @@ Helpers that take varargs or iterables:
 >>> M.foo.ALL(1,2,3)
 {'foo': {'$all': (1, 2, 3)}}
 
+Single objects must be wrapped in a list:
+>>> M.foo.IN('bar')
+Traceback (most recent call last):
+   ...
+ValueError: $in doesn't make sense with single value
+>>> M.foo.IN(['bar'])
+{'foo': {'$in': ['bar']}}
+
 $exists queries:
 >>> M.foo.EXISTS()
 {'foo': {'$exists': True}}

@@ -32,6 +32,8 @@ class Magic(dict):
 
     def __array_helper(self, name, args):
         if len(args) == 1:
+            if isinstance(args[0], basestring) or not hasattr(args[0], '__iter__'):
+                raise ValueError(name + " doesn't make sense with single value")
             args = list(args[0])
         self.__get_dict()[name] = args
         return self
